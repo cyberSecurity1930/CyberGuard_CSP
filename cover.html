@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CSP Cover | Cyber Security Awareness Campaign — RCE</title>
+  <style>
+    :root, [data-theme="dark"] {
+      --bg: #050810;
+      --panel: rgba(12, 18, 34, 0.78);
+      --cyan: #22d3ee;
+      --blue: #3b82f6;
+      --violet: #a78bfa;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --border: rgba(148, 163, 184, 0.14);
+      --chip-bg: rgba(30, 41, 59, 0.5);
+      --logo-bg: rgba(30, 41, 59, 0.45);
+      --toggle-bg: rgba(148, 163, 184, 0.15);
+      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+    [data-theme="light"] {
+      --bg: #f0f4f8;
+      --panel: rgba(255, 255, 255, 0.86);
+      --cyan: #0891b2;
+      --blue: #2563eb;
+      --violet: #7c3aed;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: rgba(15, 23, 42, 0.12);
+      --chip-bg: rgba(255, 255, 255, 0.78);
+      --logo-bg: rgba(255, 255, 255, 0.8);
+      --toggle-bg: rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    .bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 70% 45% at 50% 0%, rgba(59, 130, 246, 0.2), transparent 55%),
+        radial-gradient(ellipse 50% 40% at 90% 80%, rgba(167, 139, 250, 0.15), transparent 50%),
+        radial-gradient(ellipse 40% 30% at 10% 70%, rgba(34, 211, 238, 0.08), transparent 45%),
+        var(--bg);
+      transition: background 0.28s ease;
+    }
+    .bg::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(34, 211, 238, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34, 211, 238, 0.035) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: radial-gradient(ellipse 90% 80% at 50% 30%, black, transparent);
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: clamp(1.25rem, 3vw, 2rem) clamp(1rem, 3vw, 1.75rem) 2.5rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ========== UPPER: logos + academic details ========== */
+    .top {
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .logos {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      flex-wrap: wrap;
+    }
+
+    .logo-ph {
+      height: 56px;
+      min-width: 120px;
+      padding: 0 0.85rem;
+      border-radius: 12px;
+      border: 1px dashed rgba(148, 163, 184, 0.35);
+      background: var(--logo-bg);
+      display: grid;
+      place-items: center;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      text-align: center;
+      line-height: 1.2;
+    }
+    .logo-ph.seal {
+      min-width: 56px;
+      width: 56px;
+      border-radius: 50%;
+    }
+    .logo-slot {
+      height: 72px;
+      width: auto;
+      object-fit: contain;
+      display: block;
+    }
+    .logo-slot.college {
+      height: 78px;
+      max-width: min(420px, 55vw);
+      width: auto;
+    }
+    .logo-slot.seal {
+      height: 72px;
+      width: 72px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 4px;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+    .chip {
+      padding: 0.3rem 0.7rem;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--chip-bg);
+      color: var(--muted);
+    }
+    .chip.accent {
+      color: var(--cyan);
+      border-color: rgba(34, 211, 238, 0.35);
+      background: rgba(34, 211, 238, 0.08);
+    }
+
+    .theme-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--toggle-bg);
+      color: var(--text);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      font-size: 1.15rem;
+      transition: background 0.28s, border-color 0.28s, transform 0.2s;
+      flex-shrink: 0;
+    }
+    .theme-btn:hover { border-color: var(--cyan); background: rgba(34, 211, 238, 0.1); }
+    .theme-btn:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+    .theme-btn .icon-sun { display: none; }
+    .theme-btn .icon-moon { display: block; }
+    [data-theme="light"] .theme-btn .icon-sun { display: block; }
+    [data-theme="light"] .theme-btn .icon-moon { display: none; }
+
+    /* Detail cards row — UPPER SIDE */
+    .details {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr 1fr;
+      gap: 0.85rem;
+    }
+    @media (max-width: 800px) {
+      .details { grid-template-columns: 1fr 1fr; }
+      .details .card-inst { grid-column: 1 / -1; }
+    }
+    @media (max-width: 520px) {
+      .details { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      position: relative;
+      background: var(--panel);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.1rem 1.2rem;
+      overflow: hidden;
+      transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cyan), var(--violet), transparent);
+      opacity: 0.65;
+    }
+    .card:hover {
+      border-color: rgba(34, 211, 238, 0.28);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px -10px rgba(0, 0, 0, 0.4);
+    }
+
+    .card-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 0.65rem;
+    }
+
+    .team-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .team-list li {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      font-size: 0.86rem;
+    }
+    .team-list .dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--cyan), var(--violet));
+      flex-shrink: 0;
+      box-shadow: 0 0 6px rgba(34, 211, 238, 0.35);
+    }
+    .team-list .roll {
+      margin-left: auto;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .guide-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 0.2rem;
+    }
+    .guide-role {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .inst-name {
+      font-size: 0.92rem;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+    }
+    .inst-desc {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    /* ========== HERO (center / lower) ========== */
+    .hero {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 1.5rem 0 1rem;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.9rem;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      background: rgba(34, 211, 238, 0.1);
+      border: 1px solid rgba(34, 211, 238, 0.28);
+      border-radius: 999px;
+      margin-bottom: 1rem;
+    }
+    .badge i {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 10px var(--cyan);
+      animation: pulse 2s ease infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+
+    .dept {
+      font-size: clamp(0.78rem, 1.8vw, 0.88rem);
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 6vw, 3.6rem);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+      max-width: 52rem;
+      width: 100%;
+    }
+    h1 .line2 {
+      display: block;
+      background: linear-gradient(105deg, var(--cyan), var(--blue) 45%, var(--violet));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .tagline {
+      color: var(--muted);
+      font-size: clamp(0.95rem, 2.1vw, 1.12rem);
+      max-width: 46rem;
+      width: 100%;
+      line-height: 1.55;
+      margin-bottom: 1.75rem;
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 0.85rem;
+    }
+
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.95rem 1.7rem;
+      font-size: 1.02rem;
+      font-weight: 700;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+      box-shadow: 0 12px 32px -8px rgba(37, 99, 235, 0.55);
+      transition: transform 0.25s, box-shadow 0.25s;
+      font-family: inherit;
+    }
+    .cta:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 36px -8px rgba(37, 99, 235, 0.65);
+    }
+    .cta:focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+    }
+    .cta .arr {
+      display: inline-block;
+      transition: transform 0.3s;
+    }
+    .cta:hover .arr { transform: translateX(5px); }
+
+    .hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .foot {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--muted);
+      opacity: 0.8;
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .badge i, .card, .cta, .cta .arr { animation: none; transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg" aria-hidden="true"></div>
+
+  <div class="page">
+    <!-- ========== UPPER SIDE: logos + team / guide / institution ========== -->
+    <header class="top">
+      <div class="top-bar">
+        <div class="logos">
+          <img class="logo-slot college" src="https://res.cloudinary.com/dvryfrkwx/image/upload/v1792751398/logo1_sv3tfo.jpg" alt="Ramachandra College of Engineering">
+          <img class="logo-slot seal" src="https://res.cloudinary.com/dvryfrkwx/image/upload/f_auto/q_auto/logo2_s5urw5.jpg" alt="APSCHE">
+        </div>
+        <div class="chips">
+          <span class="chip accent">CSP 2025–26</span>
+          <span class="chip">Autonomous · RCE</span>
+          <span class="chip">CSE</span>
+          <button type="button" class="theme-btn" id="themeBtn" aria-label="Toggle light/dark theme" title="Toggle theme">
+            <span class="icon-moon" aria-hidden="true">🌙</span>
+            <span class="icon-sun" aria-hidden="true">☀️</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="details">
+        <article class="card">
+          <p class="card-label">Team Members</p>
+          <ul class="team-list">
+            <li>
+              <span class="dot" aria-hidden="true"></span>
+              B. Lakshmi Hari Narayana
+              <span class="roll">24ME1A0570 · Lead</span>
+            </li>
+            <li>
+              <span class="dot" aria-hidden="true"></span>
+              Pampana Babi Kiran Kumar
+              <span class="roll">24ME1A05B0</span>
+            </li>
+            <li>
+              <span class="dot" aria-hidden="true"></span>
+              Koreddy Pavan Venkata Durga Ganesh
+              <span class="roll">24ME1A0593</span>
+            </li>
+            <li>
+              <span class="dot" aria-hidden="true"></span>
+              Thota Siri
+              <span class="roll">24ME1A05C9</span>
+            </li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <p class="card-label">Project Guide</p>
+          <p class="guide-name">Faculty Name</p>
+          <p class="guide-role">
+            Assistant / Associate Professor<br>
+            Dept. of CSE
+          </p>
+        </article>
+
+        <article class="card card-inst">
+          <p class="card-label">Institution</p>
+          <p class="inst-name">Ramachandra College of Engineering</p>
+          <p class="inst-desc">
+            Autonomous · Ganta Sriram Educational Society ·
+            RATNAM Educational Institutions, Nellore ·
+            Initially affiliated with JNTU Kakinada
+          </p>
+        </article>
+      </div>
+    </header>
+
+    <!-- ========== HERO ========== -->
+    <section class="hero">
+      <span class="badge"><i></i> Community Service Project</span>
+      <p class="dept">Department of Computer Science &amp; Engineering</p>
+      <h1>
+        Cyber Security
+        <span class="line2">Awareness Campaign</span>
+      </h1>
+      <p class="tagline">
+        An interactive initiative by CSE students to build digital safety
+        habits across campus and community — threats, tools, and hands-on practice.
+      </p>
+      <div class="cta-row">
+        <a class="cta" href="index.html">
+          Explore Cyber Security
+          <span class="arr" aria-hidden="true">→</span>
+        </a>
+        <span class="hint">No auto-redirect · enter when ready</span>
+      </div>
+    </section>
+
+    <p class="foot">Community Service Project · Cyber Security Awareness Campaign · RCE</p>
+  </div>
+  <script>
+    const root = document.documentElement;
+    const themeBtn = document.getElementById('themeBtn');
+
+    function getPreferredTheme() {
+      const saved = localStorage.getItem('csp-theme');
+      if (saved === 'light' || saved === 'dark') return saved;
+      if (window.matchMedia('(prefers-color-scheme: light)').matches) return 'light';
+      return 'dark';
+    }
+
+    function setTheme(theme) {
+      root.setAttribute('data-theme', theme);
+      localStorage.setItem('csp-theme', theme);
+      themeBtn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+    }
+
+    setTheme(getPreferredTheme());
+    themeBtn.addEventListener('click', () => {
+      const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      setTheme(next);
+    });
+  </script>
+</body>
+</html>

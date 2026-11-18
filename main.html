@@ -1149,6 +1149,34 @@
       #overview .hero-ctas { justify-content: flex-start; }
     }
 
+    @media (max-width: 480px) {
+  .back-cover span.label { display: none; }
+
+  /* Keep CyberGuard name visible on mobile */
+  .nav-left {
+    flex: 1 1 auto;
+    min-width: 0;
+    gap: 0.5rem;
+  }
+
+  .nav-brand {
+    display: inline-flex;
+    flex: 0 1 auto;
+    min-width: 0;
+    font-size: 0.9rem;
+    gap: 0.4rem;
+  }
+
+  .nav-brand span.name {
+    display: inline;
+    overflow: visible;
+  }
+
+  .nav-actions {
+    flex: 0 0 auto;
+    gap: 0.35rem;
+  }
+}
   
     /* Campus photograph */
     .campus-photo {
